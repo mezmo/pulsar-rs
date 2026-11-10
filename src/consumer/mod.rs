@@ -10,10 +10,11 @@ pub(crate) mod initial_position;
 pub mod message;
 mod multi;
 pub mod options;
+mod ready_streams;
 pub mod topic;
 
 use std::{
-    collections::{BTreeMap, BTreeSet, VecDeque},
+    collections::{BTreeSet, VecDeque},
     pin::Pin,
     time::Duration,
 };
@@ -31,6 +32,7 @@ pub use initial_position::InitialPosition;
 pub use message::Message;
 use multi::MultiTopicConsumer;
 pub use options::ConsumerOptions;
+use ready_streams::ReadyStreams;
 pub use topic::TopicConsumer;
 use url::Url;
 
@@ -226,7 +228,7 @@ impl<T: DeserializeMessage, Exe: Executor> Consumer<T, Exe> {
                 }))
                 .await?;
 
-                let consumers: BTreeMap<_, _> = consumers
+                let consumers: ReadyStreams<_> = consumers
                     .into_iter()
                     .map(|c| (c.topic(), Box::pin(c)))
                     .collect();
